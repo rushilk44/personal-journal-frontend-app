@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./pages/Profile";
+import Profile from "./pages/profile";
 import Journal from "./pages/Journal";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
