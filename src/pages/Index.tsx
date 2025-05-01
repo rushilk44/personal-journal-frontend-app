@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +10,7 @@ const Index = () => {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col">
-      <Header />
+      <HeroHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         {isAuthenticated ? (
@@ -22,7 +23,7 @@ const Index = () => {
   );
 };
 
-const Header = () => {
+const HeroHeader = () => {
   return (
     <div className="bg-gradient-to-r from-journal-primary to-journal-accent py-12 px-4 text-white">
       <div className="container mx-auto text-center">
