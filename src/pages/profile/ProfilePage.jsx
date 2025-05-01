@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserData, updateUserData, deleteUserAccount, User } from "@/services/api";
+import { getUserData, updateUserData, deleteUserAccount } from "@/services/api";
 import ProfileForm from "./components/ProfileForm";
 import DeleteAccountSection from "./components/DeleteAccountSection";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 
 const ProfilePage = () => {
   const { username, password, logout, updateLocalUser } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -34,13 +34,7 @@ const ProfilePage = () => {
     fetchUserData();
   }, [username, password, updateLocalUser]);
 
-  const handleUpdateProfile = async (formData: {
-    userName: string;
-    email: string;
-    newPassword: string;
-    confirmPassword: string;
-    sentimentAnalysis: boolean;
-  }) => {
+  const handleUpdateProfile = async (formData) => {
     // Validate passwords if user is trying to change it
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
       toast.error("Passwords do not match");
@@ -48,7 +42,7 @@ const ProfilePage = () => {
     }
     
     try {
-      const updateData: User = {
+      const updateData = {
         userName: formData.userName,
         email: formData.email,
         sentimentAnalysis: formData.sentimentAnalysis

@@ -4,20 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { User } from "@/services/api";
 
-interface ProfileFormProps {
-  user: User | null;
-  onSubmit: (formData: {
-    userName: string;
-    email: string;
-    newPassword: string;
-    confirmPassword: string;
-    sentimentAnalysis: boolean;
-  }) => void;
-}
-
-const ProfileForm = ({ user, onSubmit }: ProfileFormProps) => {
+const ProfileForm = ({ user, onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     userName: "",
@@ -39,7 +27,7 @@ const ProfileForm = ({ user, onSubmit }: ProfileFormProps) => {
     }
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -47,14 +35,14 @@ const ProfileForm = ({ user, onSubmit }: ProfileFormProps) => {
     }));
   };
 
-  const handleCheckboxChange = (checked: boolean) => {
+  const handleCheckboxChange = (checked) => {
     setFormData((prev) => ({
       ...prev,
       sentimentAnalysis: checked
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     

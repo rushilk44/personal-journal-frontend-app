@@ -13,11 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface DeleteAccountSectionProps {
-  onDeleteAccount: () => Promise<void>;
-}
-
-const DeleteAccountSection = ({ onDeleteAccount }: DeleteAccountSectionProps) => {
+const DeleteAccountSection = ({ onDeleteAccount }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleDeleteConfirm = async () => {
