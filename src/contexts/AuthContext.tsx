@@ -2,10 +2,11 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "@/components/ui/sonner";
-import { User, checkAuth } from '@/services/api';
+import { User, checkAuth, getUserData } from '@/services/api';
 
 interface AuthState {
   isAuthenticated: boolean;
+  isAdmin: boolean;
   user: Partial<User> | null;
   username: string;
   password: string;
@@ -22,6 +23,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<Partial<User> | null>(null);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -42,7 +44,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const isValid = await checkAuth(username, password);
       
       if (isValid) {
+        // Get user data to check if admin
+        const userData = await getUserData(username, password);
         setIsAuthenticated(true);
+        setIsAdmin(userData.role === 'ADMIN');
+        setUser(userData);
         setUsername(username);
         setPassword(password);
         return true;
@@ -61,9 +67,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const isValid = await checkAuth(username, password);
       
       if (isValid) {
+        // Get user data to check if admin
+        const userData = await getUserData(username, password);
+        
         localStorage.setItem('journal_username', username);
         localStorage.setItem('journal_password', password);
         setIsAuthenticated(true);
+        setIsAdmin(userData.role === 'ADMIN');
+        setUser(userData);
         setUsername(username);
         setPassword(password);
         toast.success("Login successful");
@@ -88,6 +99,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('journal_username');
     localStorage.removeItem('journal_password');
     setIsAuthenticated(false);
+    setIsAdmin(false);
     setUser(null);
     setUsername('');
     setPassword('');
@@ -100,6 +112,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated, 
+      isAdmin,
       user, 
       username, 
       password, 

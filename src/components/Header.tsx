@@ -1,11 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, User, BookOpen } from "lucide-react";
+import { LogOut, User, BookOpen, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
 
   return (
     <header className="w-full bg-white shadow-sm">
@@ -22,12 +22,23 @@ const Header = () => {
                 <span>Journal</span>
               </Button>
             </Link>
+            
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Shield size={16} />
+                  <span>Admin</span>
+                </Button>
+              </Link>
+            )}
+            
             <Link to="/profile">
               <Button variant="outline" size="sm" className="gap-2">
                 <User size={16} />
                 <span>Profile</span>
               </Button>
             </Link>
+            
             <Button 
               variant="ghost" 
               size="sm" 

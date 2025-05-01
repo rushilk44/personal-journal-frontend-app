@@ -6,6 +6,7 @@ export interface User {
   email: string;
   password?: string;
   sentimentAnalysis: boolean;
+  role?: 'USER' | 'ADMIN';
 }
 
 export interface JournalEntry {
@@ -142,6 +143,39 @@ export const getJournalEntries = async (username: string, password: string): Pro
     return handleResponse(response);
   } catch (error) {
     toast.error("Failed to fetch journal entries");
+    throw error;
+  }
+};
+
+// Admin APIs
+
+// Get all users (admin only)
+export const getAllUsers = async (username: string, password: string): Promise<User[]> => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/all-users`, {
+      method: "GET",
+      headers: createAuthHeader(username, password)
+    });
+    
+    return handleResponse(response);
+  } catch (error) {
+    toast.error("Failed to fetch users");
+    throw error;
+  }
+};
+
+// Create admin user (admin only)
+export const createAdminUser = async (username: string, password: string, userData: User): Promise<User> => {
+  try {
+    const response = await fetch(`${BASE_URL}/admin/create-admin-user`, {
+      method: "POST",
+      headers: createAuthHeader(username, password),
+      body: JSON.stringify(userData)
+    });
+    
+    return handleResponse(response);
+  } catch (error) {
+    toast.error("Failed to create admin user");
     throw error;
   }
 };

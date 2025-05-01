@@ -10,9 +10,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Journal from "./pages/Journal";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,14 @@ const App = () => (
                     <ProtectedRoute>
                       <Journal />
                     </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminProtectedRoute>
+                      <Admin />
+                    </AdminProtectedRoute>
                   }
                 />
                 <Route path="*" element={<NotFound />} />
