@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +35,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/journal"
+                  element={
+                    <ProtectedRoute>
+                      <Journal />
                     </ProtectedRoute>
                   }
                 />

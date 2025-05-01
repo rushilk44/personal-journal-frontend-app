@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
@@ -16,6 +16,12 @@ const Header = () => {
         
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
+            <Link to="/journal">
+              <Button variant="outline" size="sm" className="gap-2">
+                <BookOpen size={16} />
+                <span>Journal</span>
+              </Button>
+            </Link>
             <Link to="/profile">
               <Button variant="outline" size="sm" className="gap-2">
                 <User size={16} />

@@ -8,6 +8,13 @@ export interface User {
   sentimentAnalysis: boolean;
 }
 
+export interface JournalEntry {
+  id?: number;
+  title: string;
+  content: string;
+  createdAt?: string;
+}
+
 const BASE_URL = "http://localhost:8081/journal";
 
 // Helper function to handle API responses
@@ -103,5 +110,38 @@ export const checkAuth = async (username: string, password: string): Promise<boo
     return true;
   } catch (error) {
     return false;
+  }
+};
+
+// Journal entry APIs
+
+// Create a new journal entry
+export const createJournalEntry = async (username: string, password: string, entry: JournalEntry): Promise<JournalEntry> => {
+  try {
+    const response = await fetch(`${BASE_URL}/journal`, {
+      method: "POST",
+      headers: createAuthHeader(username, password),
+      body: JSON.stringify(entry)
+    });
+    
+    return handleResponse(response);
+  } catch (error) {
+    toast.error("Failed to create journal entry");
+    throw error;
+  }
+};
+
+// Get all journal entries
+export const getJournalEntries = async (username: string, password: string): Promise<JournalEntry[]> => {
+  try {
+    const response = await fetch(`${BASE_URL}/journal`, {
+      method: "GET",
+      headers: createAuthHeader(username, password)
+    });
+    
+    return handleResponse(response);
+  } catch (error) {
+    toast.error("Failed to fetch journal entries");
+    throw error;
   }
 };

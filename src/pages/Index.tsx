@@ -1,9 +1,8 @@
-
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 
 const Index = () => {
   const { isAuthenticated, user } = useAuth();
@@ -97,12 +96,25 @@ const AuthenticatedHome = ({ username }: { username: string }) => {
           </p>
           
           <div className="p-8 text-center bg-gray-50 rounded-lg border border-gray-100">
+            <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-xl font-medium mb-2">Your Journal</h3>
+            <p className="text-muted-foreground mb-4">
+              Create new entries or view your previous journal entries
+            </p>
+            <Link to="/journal">
+              <Button className="bg-journal-primary hover:bg-journal-primary/90">
+                Open Journal
+              </Button>
+            </Link>
+          </div>
+
+          <div className="p-8 text-center bg-gray-50 rounded-lg border border-gray-100 mt-6">
             <h3 className="text-xl font-medium mb-2">Manage Your Profile</h3>
             <p className="text-gray-600 mb-4">
               Update your profile settings or preferences
             </p>
             <Link to="/profile">
-              <Button className="bg-journal-primary hover:bg-journal-primary/90">
+              <Button variant="outline">
                 View Profile
               </Button>
             </Link>
