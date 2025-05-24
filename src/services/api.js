@@ -1,24 +1,40 @@
-
 import { toast } from "@/components/ui/sonner";
 
 export const BASE_URL = "http://localhost:8081/journal";
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
-  console.log('API Response status:', response.status);
-  console.log('API Response headers:', response.headers);
+  console.log('📡 API Response status:', response.status);
+  console.log('📡 API Response headers:', [...response.headers.entries()]);
   
   if (!response.ok) {
-    const errorMessage = await response.text().catch(() => "An unknown error occurred");
-    console.error('API Error response:', errorMessage);
-    throw new Error(errorMessage || `Error: ${response.status}`);
+    let errorMessage;
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || `HTTP ${response.status}`;
+      } else {
+        errorMessage = await response.text() || `HTTP Error ${response.status}`;
+      }
+    } catch (parseError) {
+      errorMessage = `HTTP Error ${response.status} - ${response.statusText}`;
+    }
+    
+    console.error('❌ API Error response:', errorMessage);
+    throw new Error(errorMessage);
   }
   
   if (response.status === 204) {
     return null;
   }
   
-  return response.json().catch(() => null);
+  try {
+    return await response.json();
+  } catch (parseError) {
+    console.warn('⚠️ Response not JSON, returning null');
+    return null;
+  }
 };
 
 // Helper function to create auth headers
@@ -32,26 +48,26 @@ const createAuthHeader = (username, password) => {
 // Test connection to backend
 export const testConnection = async () => {
   try {
-    console.log('Testing connection to:', BASE_URL);
+    console.log('🔍 Testing connection to:', BASE_URL);
     const response = await fetch(`${BASE_URL}/public/health`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
       }
     });
-    console.log('Connection test response:', response.status);
+    console.log('🔍 Health check response:', response.status);
     return response.ok;
   } catch (error) {
-    console.error('Connection test failed:', error);
-    return false;
+    console.error('❌ Connection test failed:', error);
+    throw new Error(`Connection failed: ${error.message}`);
   }
 };
 
 // Register a new user
 export const registerUser = async (userData) => {
   try {
-    console.log('Attempting to register user:', { ...userData, password: '[HIDDEN]' });
-    console.log('Registration URL:', `${BASE_URL}/public/create-user`);
+    console.log('📝 Attempting to register user:', { ...userData, password: '[HIDDEN]' });
+    console.log('📝 Registration URL:', `${BASE_URL}/public/create-user`);
     
     const response = await fetch(`${BASE_URL}/public/create-user`, {
       method: "POST",
@@ -61,10 +77,12 @@ export const registerUser = async (userData) => {
       body: JSON.stringify(userData)
     });
     
-    console.log('Registration response status:', response.status);
-    return handleResponse(response);
+    console.log('📝 Registration response status:', response.status);
+    const result = await handleResponse(response);
+    console.log('✅ Registration successful');
+    return result;
   } catch (error) {
-    console.error('Registration error details:', error);
+    console.error('❌ Registration error details:', error);
     toast.error(`Registration failed: ${error.message}`);
     throw error;
   }
@@ -125,11 +143,12 @@ export const deleteUserAccount = async (username, password) => {
 // Check authentication
 export const checkAuth = async (username, password) => {
   try {
-    console.log('Checking authentication for:', username);
+    console.log('🔐 Checking authentication for:', username);
     await getUserData(username, password);
+    console.log('✅ Authentication successful');
     return true;
   } catch (error) {
-    console.log('Authentication check failed:', error.message);
+    console.log('❌ Authentication check failed:', error.message);
     return false;
   }
 };
