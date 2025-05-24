@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/sonner";
 
 export interface User {
@@ -16,7 +15,7 @@ export interface JournalEntry {
   createdAt?: string;
 }
 
-const BASE_URL = "http://localhost:8081/journal";
+export const BASE_URL = "http://localhost:8081/journal";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -40,9 +39,40 @@ const createAuthHeader = (username: string, password: string) => {
   };
 };
 
+// Test connection to backend
+export const testConnection = async (): Promise<boolean> => {
+  try {
+    console.log('🔍 Testing connection to:', `${BASE_URL}/public/health`);
+    const response = await fetch(`${BASE_URL}/public/health`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    
+    console.log('🔍 Health check response status:', response.status);
+    console.log('🔍 Health check response headers:', [...response.headers.entries()]);
+    
+    if (response.ok) {
+      const data = await response.text();
+      console.log('✅ Health check successful, response:', data);
+      return true;
+    } else {
+      console.log('❌ Health check failed with status:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Health check error:', error);
+    return false;
+  }
+};
+
 // Register a new user
 export const registerUser = async (userData: User): Promise<User> => {
   try {
+    console.log('🚀 Attempting registration to:', `${BASE_URL}/public/create-user`);
+    console.log('🚀 Registration data:', { ...userData, password: '[HIDDEN]' });
+    
     const response = await fetch(`${BASE_URL}/public/create-user`, {
       method: "POST",
       headers: {
@@ -51,9 +81,24 @@ export const registerUser = async (userData: User): Promise<User> => {
       body: JSON.stringify(userData)
     });
     
-    return handleResponse(response);
+    console.log('🚀 Registration response status:', response.status);
+    console.log('🚀 Registration response headers:', [...response.headers.entries()]);
+    
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "Failed to read error response");
+      console.log('❌ Registration failed with error:', errorText);
+      throw new Error(`Registration failed: ${response.status} - ${errorText}`);
+    }
+    
+    const result = await response.json().catch(() => null);
+    console.log('✅ Registration successful, response:', result);
+    return result;
+    
   } catch (error) {
-    toast.error("Registration failed");
+    console.error('❌ Registration error details:', error);
+    if (error instanceof TypeError && error.message === 'Load failed') {
+      throw new Error('Cannot connect to backend server. Please ensure your Spring Boot application is running on http://localhost:8081');
+    }
     throw error;
   }
 };
