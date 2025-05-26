@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/sonner";
 
 export interface User {
@@ -9,13 +10,13 @@ export interface User {
 }
 
 export interface JournalEntry {
-  id?: number;
+  id?: string; // Changed from number to string for MongoDB ObjectId
   title: string;
   content: string;
   createdAt?: string;
 }
 
-export const BASE_URL = "http://localhost:8081/journal";
+export const BASE_URL = "http://localhost:8081";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -90,13 +91,16 @@ export const registerUser = async (userData: User): Promise<User> => {
       throw new Error(`Registration failed: ${response.status} - ${errorText}`);
     }
     
-    const result = await response.json().catch(() => null);
+    // Since your backend returns a string, we need to handle it differently
+    const result = await response.text();
     console.log('✅ Registration successful, response:', result);
-    return result;
+    
+    // Return the user data since backend only returns success message
+    return userData;
     
   } catch (error) {
     console.error('❌ Registration error details:', error);
-    if (error instanceof TypeError && error.message === 'Load failed') {
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       throw new Error('Cannot connect to backend server. Please ensure your Spring Boot application is running on http://localhost:8081');
     }
     throw error;
