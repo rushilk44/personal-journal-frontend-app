@@ -1,4 +1,5 @@
 
+
 import { toast } from "@/components/ui/sonner";
 
 export interface User {
@@ -16,7 +17,7 @@ export interface JournalEntry {
   createdAt?: string;
 }
 
-export const BASE_URL = "http://localhost:8081";
+export const BASE_URL = "http://localhost:8081/journal";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -107,7 +108,7 @@ export const registerUser = async (userData: User): Promise<User> => {
   }
 };
 
-// Get user data
+// Get user data (greeting endpoint)
 export const getUserData = async (username: string, password: string): Promise<User> => {
   try {
     const response = await fetch(`${BASE_URL}/user`, {
@@ -115,7 +116,21 @@ export const getUserData = async (username: string, password: string): Promise<U
       headers: createAuthHeader(username, password)
     });
     
-    return handleResponse(response);
+    if (!response.ok) {
+      throw new Error(`Failed to get user data: ${response.status}`);
+    }
+    
+    // Your backend returns a greeting string, not user object
+    // We'll create a basic user object for the frontend
+    const greeting = await response.text();
+    console.log('✅ User greeting:', greeting);
+    
+    return {
+      userName: username,
+      email: '', // Not returned by your backend
+      sentimentAnalysis: true, // Default value
+      role: username === 'admin' ? 'ADMIN' : 'USER' // Simple role detection
+    };
   } catch (error) {
     toast.error("Failed to fetch user data");
     throw error;
@@ -128,10 +143,17 @@ export const updateUserData = async (username: string, password: string, userDat
     const response = await fetch(`${BASE_URL}/user`, {
       method: "PUT",
       headers: createAuthHeader(username, password),
-      body: JSON.stringify(userData)
+      body: JSON.stringify({
+        userName: userData.userName,
+        password: userData.password
+      })
     });
     
-    return handleResponse(response);
+    if (!response.ok) {
+      throw new Error(`Failed to update user: ${response.status}`);
+    }
+    
+    return userData;
   } catch (error) {
     toast.error("Failed to update user data");
     throw error;
@@ -146,7 +168,9 @@ export const deleteUserAccount = async (username: string, password: string): Pro
       headers: createAuthHeader(username, password)
     });
     
-    return handleResponse(response);
+    if (!response.ok) {
+      throw new Error(`Failed to delete account: ${response.status}`);
+    }
   } catch (error) {
     toast.error("Failed to delete account");
     throw error;
@@ -171,7 +195,10 @@ export const createJournalEntry = async (username: string, password: string, ent
     const response = await fetch(`${BASE_URL}/journal`, {
       method: "POST",
       headers: createAuthHeader(username, password),
-      body: JSON.stringify(entry)
+      body: JSON.stringify({
+        title: entry.title,
+        content: entry.content
+      })
     });
     
     return handleResponse(response);
@@ -228,3 +255,4 @@ export const createAdminUser = async (username: string, password: string, userDa
     throw error;
   }
 };
+
