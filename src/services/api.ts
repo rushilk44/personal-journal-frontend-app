@@ -9,7 +9,7 @@ export interface User {
 }
 
 export interface JournalEntry {
-  id?: string; // Changed from number to string for MongoDB ObjectId
+  id?: string;
   title: string;
   content: string;
   createdAt?: string;
@@ -90,23 +90,17 @@ export const registerUser = async (userData: User): Promise<User> => {
       throw new Error(`Registration failed: ${response.status} - ${errorText}`);
     }
     
-    // Since your backend returns a string, we need to handle it differently
     const result = await response.text();
     console.log('✅ Registration successful, response:', result);
     
-    // Return the user data since backend only returns success message
     return userData;
-    
   } catch (error) {
     console.error('❌ Registration error details:', error);
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new Error('Cannot connect to backend server. Please ensure your Spring Boot application is running on http://localhost:8081');
-    }
     throw error;
   }
 };
 
-// Get user data (greeting endpoint)
+// Get user data
 export const getUserData = async (username: string, password: string): Promise<User> => {
   try {
     const response = await fetch(`${BASE_URL}/user`, {
@@ -118,16 +112,14 @@ export const getUserData = async (username: string, password: string): Promise<U
       throw new Error(`Failed to get user data: ${response.status}`);
     }
     
-    // Your backend returns a greeting string, not user object
-    // We'll create a basic user object for the frontend
     const greeting = await response.text();
     console.log('✅ User greeting:', greeting);
     
     return {
       userName: username,
-      email: '', // Not returned by your backend
-      sentimentAnalysis: true, // Default value
-      role: username === 'admin' ? 'ADMIN' : 'USER' // Simple role detection
+      email: '',
+      sentimentAnalysis: true,
+      role: username === 'admin' ? 'ADMIN' : 'USER'
     };
   } catch (error) {
     toast.error("Failed to fetch user data");
@@ -185,8 +177,6 @@ export const checkAuth = async (username: string, password: string): Promise<boo
   }
 };
 
-// Journal entry APIs
-
 // Create a new journal entry
 export const createJournalEntry = async (username: string, password: string, entry: JournalEntry): Promise<JournalEntry> => {
   try {
@@ -220,8 +210,6 @@ export const getJournalEntries = async (username: string, password: string): Pro
     throw error;
   }
 };
-
-// Admin APIs
 
 // Get all users (admin only)
 export const getAllUsers = async (username: string, password: string): Promise<User[]> => {
