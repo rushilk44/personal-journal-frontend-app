@@ -1,5 +1,3 @@
-
-
 import { toast } from "@/components/ui/sonner";
 
 export interface User {
@@ -17,7 +15,7 @@ export interface JournalEntry {
   createdAt?: string;
 }
 
-export const BASE_URL = "http://localhost:8081/journal";
+export const BASE_URL = "https://journalapp-production-db85.up.railway.app/journal";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
@@ -255,4 +253,3 @@ export const createAdminUser = async (username: string, password: string, userDa
     throw error;
   }
 };
-
