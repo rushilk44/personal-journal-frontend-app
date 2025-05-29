@@ -33,8 +33,12 @@ const handleResponse = async (response: Response) => {
 
 // Helper function to create auth headers
 const createAuthHeader = (username: string, password: string) => {
+  const credentials = btoa(`${username}:${password}`);
+  console.log('🔐 Creating Basic Auth for user:', username);
+  console.log('🔐 Base64 credentials:', credentials);
+  
   return {
-    Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+    Authorization: `Basic ${credentials}`,
     "Content-Type": "application/json"
   };
 };
@@ -120,15 +124,25 @@ export const registerUser = async (userData: User): Promise<User> => {
   }
 };
 
-// Get user data
+// Get user data with better Basic Auth logging
 export const getUserData = async (username: string, password: string): Promise<User> => {
   try {
+    console.log('👤 Getting user data for:', username);
+    const headers = createAuthHeader(username, password);
+    console.log('👤 Request headers:', headers);
+    
     const response = await fetch(`${BASE_URL}/user`, {
       method: "GET",
-      headers: createAuthHeader(username, password)
+      headers
     });
     
+    console.log('👤 Response status:', response.status);
+    console.log('👤 Response headers:', [...response.headers.entries()]);
+    
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Invalid username or password');
+      }
       throw new Error(`Failed to get user data: ${response.status}`);
     }
     
@@ -142,8 +156,26 @@ export const getUserData = async (username: string, password: string): Promise<U
       role: username === 'admin' ? 'ADMIN' : 'USER'
     };
   } catch (error) {
-    toast.error("Failed to fetch user data");
+    console.error('❌ getUserData error:', error);
+    if (error.message && error.message.includes('401')) {
+      toast.error("Invalid username or password");
+    } else {
+      toast.error("Failed to fetch user data");
+    }
     throw error;
+  }
+};
+
+// Check authentication with improved logging
+export const checkAuth = async (username: string, password: string): Promise<boolean> => {
+  try {
+    console.log('🔍 Checking authentication for user:', username);
+    await getUserData(username, password);
+    console.log('✅ Authentication successful');
+    return true;
+  } catch (error) {
+    console.log('❌ Authentication failed:', error.message);
+    return false;
   }
 };
 
@@ -184,16 +216,6 @@ export const deleteUserAccount = async (username: string, password: string): Pro
   } catch (error) {
     toast.error("Failed to delete account");
     throw error;
-  }
-};
-
-// Check authentication
-export const checkAuth = async (username: string, password: string): Promise<boolean> => {
-  try {
-    await getUserData(username, password);
-    return true;
-  } catch (error) {
-    return false;
   }
 };
 
