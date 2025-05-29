@@ -85,8 +85,18 @@ export const registerUser = async (userData: User): Promise<User> => {
     console.log('🚀 Registration response headers:', [...response.headers.entries()]);
     
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "Failed to read error response");
-      console.log('❌ Registration failed with error:', errorText);
+      let errorText;
+      try {
+        // Try to parse as JSON first
+        const errorJson = await response.json();
+        errorText = JSON.stringify(errorJson);
+        console.log('❌ Registration failed with JSON error:', errorJson);
+      } catch {
+        // Fallback to text if JSON parsing fails
+        errorText = await response.text().catch(() => "Failed to read error response");
+        console.log('❌ Registration failed with text error:', errorText);
+      }
+      
       throw new Error(`Registration failed: ${response.status} - ${errorText}`);
     }
     
@@ -96,6 +106,16 @@ export const registerUser = async (userData: User): Promise<User> => {
     return userData;
   } catch (error) {
     console.error('❌ Registration error details:', error);
+    
+    // Provide more user-friendly error messages based on the error
+    if (error.message && error.message.includes('500')) {
+      throw new Error('Server error occurred. Please check if your backend is running properly and try again.');
+    } else if (error.message && error.message.includes('duplicate') || error.message.includes('already exists')) {
+      throw new Error('An account with this username or email already exists.');
+    } else if (error.message && error.message.includes('Failed to fetch')) {
+      throw new Error('Cannot connect to server. Please ensure your backend is running on localhost:8081.');
+    }
+    
     throw error;
   }
 };
