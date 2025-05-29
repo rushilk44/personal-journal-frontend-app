@@ -15,7 +15,7 @@ export interface JournalEntry {
   createdAt?: string;
 }
 
-export const BASE_URL = "https://journalapp-production-db85.up.railway.app/journal";
+export const BASE_URL = "http://localhost:8081/journal";
 
 // Helper function to handle API responses
 const handleResponse = async (response: Response) => {
